@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--        User selectById(int id);-->
+<!--        User selectByName(String username);-->
+<!--        User selectByEmail(String email);-->
+<!--        int insertUser(User user);-->
+<!--        int updateStatus(int id,int status);-->
+<!--        int updateHeader(int id,String headerUrl);-->
+<!--        int updatePassword(int id,String password);-->
+<mapper namespace="com.xuan.base.dao.front.UserMapper">
+
+    <resultMap id="FrontUserInfo" type="com.xuan.base.entity.front.FrontUser">
+        <id column="id" property="id"/>
+        <result column="user_name" property="userName"/>
+        <result column="password" property="password"/>
+        <result column="address" property="address"/>
+        <result column="email" property="email"/>
+        <result column="type" property="type"/>
+        <result column="status" property="status"/>
+        <result column="mobile" property="mobile"/>
+        <result column="head_pic" property="headPic"/>
+        <result column="create_time" property="createTime"/>
+        <result column="sex" property="sex"/>
+        <result column="expire_time" property="expireTime"/>
+    </resultMap>
+
+<!--    <sql id="insertFields">-->
+<!--        user_name as userName,password ,address,email,type,status,mobile,head_pic as headPic,create_time as createTime,sex,expire_time as expireTime,update_time as updateTime-->
+<!--    </sql>-->
+
+<!--    <sql id="selectFields">-->
+<!--        id, user_name as userName,password ,address,email,type,status,mobile,head_pic as headPic,create_time as createTime,sex,expire_time as expireTime,update_time as updateTime-->
+
+<!--    </sql>-->
+
+    <sql id="insertFields">
+        user_name ,password ,address,email,type,status,mobile,head_pic ,create_time ,sex,expire_time ,update_time
+    </sql>
+
+    <sql id="selectFields">
+        id, user_name,password ,address,email,type,status,mobile,head_pic ,create_time ,sex,expire_time ,update_time
+
+    </sql>
+
+    <select id="selectById" resultMap="FrontUserInfo">
+        select <include refid="selectFields"></include>
+        from db_boot_uniqlo.uniqlo_frontuser
+        where id=#{id}
+    </select>
+
+    <select id="selectAllUser" resultMap="FrontUserInfo">
+        select * from db_boot_uniqlo.uniqlo_frontuser
+    </select>
+
+    <select id="selectAllExpireUsers" resultMap="FrontUserInfo">
+        select * from db_boot_uniqlo.uniqlo_frontuser where expire_time &lt;= #{date} and status = 0
+    </select>
+
+    <select id="selectByName" resultMap="FrontUserInfo">
+        select <include refid="selectFields"></include>
+        from db_boot_uniqlo.uniqlo_frontuser
+        where user_name=#{userName}
+    </select>
+
+    <select id="selectByEmail" resultMap="FrontUserInfo">
+        select <include refid="selectFields"></include>
+        from db_boot_uniqlo.uniqlo_frontuser
+        where email=#{email}
+    </select>
+
+    <insert id="insertUser" parameterType="com.xuan.base.entity.front.FrontUser" keyProperty="id" useGeneratedKeys="true">
+        insert into db_boot_uniqlo.uniqlo_frontuser(<include refid="insertFields"></include>)
+        values(#{userName},#{password},#{address},#{email},#{type},#{status},#{mobile},#{headPic},#{createTime},#{sex},#{expireTime},#{updateTime})
+    </insert>
+
+    <update id="updateStatus">
+        update db_boot_uniqlo.uniqlo_frontuser set status=#{status}
+        where id=#{id}
+    </update>
+
+    <update id="updateType">
+        update db_boot_uniqlo.uniqlo_frontuser set type=#{type}
+        where id=#{id}
+    </update>
+
+    <update id="updateHeader">
+        update db_boot_uniqlo.uniqlo_frontuser set head_pic=#{headerPic}
+        where id=#{id}
+    </update>
+
+    <update id="updatePassword">
+        update db_boot_uniqlo.uniqlo_frontuser set password=#{password}
+        where id=#{id}
+    </update>
+
+    <update id="updateExpireTime">
+        update db_boot_uniqlo.uniqlo_frontuser set expire_time=#{expireTime}
+        where id=#{id}
+    </update>
+
+    <update id="updateUser" parameterType="com.xuan.base.entity.front.FrontUser">
+        update db_boot_uniqlo.uniqlo_frontuser
+        set mobile = #{mobile}, address = #{address}, email = #{email}
+        where id=#{id}
+    </update>
+
+</mapper>

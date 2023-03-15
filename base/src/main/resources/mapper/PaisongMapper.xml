@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xuan.base.mapper.PaisongMapper">
+    <resultMap id="BaseResultMap" type="com.xuan.base.entity.admin.Paisong">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="dingdan_id" jdbcType="INTEGER" property="dingdan_id" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="create_time" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="update_time" />
+        <result column="dingdan_no" jdbcType="VARCHAR" property="dingdan_no" />
+        <result column="wuliu_no" jdbcType="VARCHAR" property="wuliu_no" />
+        <result column="statue" jdbcType="INTEGER" property="statue" />
+    </resultMap>
+    <!--1.返回所有派送单信息-->
+    <select id="selectAll"  resultType="com.xuan.base.entity.admin.Paisong">
+        select * from paisong_info where paisong_info.statue>0;
+    </select>
+
+    <!--2.增加用户信息-->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="com.xuan.base.entity.admin.Paisong" >
+        insert into paisong_info
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="name != null" >
+                name,
+            </if>
+            <if test="dingdan_id != null" >
+                dingdan_id,
+            </if>
+            <if test="create_time != null" >
+                create_time,
+            </if>
+            <if test="update_time != null" >
+                update_time,
+            </if>
+            <if test="dingdan_no != null" >
+                dingdan_no,
+            </if>
+            <if test="wuliu_no != null" >
+                wuliu_no,
+            </if>
+            <if test="statue != null" >
+                statue,
+            </if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null" >
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="dingdan_id != null" >
+                #{dingdan_id,jdbcType=INTEGER},
+            </if>
+            <if test="create_time != null" >
+                #{create_time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="update_time != null" >
+                #{update_time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="dingdan_no != null" >
+                #{dingdan_no,jdbcType=VARCHAR},
+            </if>
+            <if test="wuliu_no != null" >
+                #{wuliu_no,jdbcType=VARCHAR},
+            </if>
+            <if test="statue != null" >
+                #{statue,jdbcType=INTEGER},
+            </if>
+        </trim>
+        ON DUPLICATE KEY UPDATE
+        name=#{name},
+        dingdan_id=#{dingdan_id},
+        create_time=#{create_time},
+        update_time=CURRENT_TIMESTAMP,
+        dingdan_no=#{dingdan_no},
+        wuliu_no=#{wuliu_no},
+        statue=#{statue}
+
+    </insert>
+
+    <!--3.根据id更改派送单状态-->
+    <update id="update" parameterType="int">
+        update paisong_info
+        <set >
+            <if test="statue != null" >
+                statue = statue+1,
+            </if>
+            <if test="update_time != null" >
+                update_time = CURRENT_TIMESTAMP ,
+            </if>
+
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--4.根据id查找派送单-->
+    <select id="getpaisong" resultType="com.xuan.base.entity.admin.Paisong">
+        select * from paisong_info where id = #{id}
+    </select>
+    <!-- 5.删除用户信息-->
+    <update id="delete" parameterType="com.xuan.base.entity.admin.Paisong">
+        update paisong_info
+        <set >
+            <if test="statue != null" >
+                statue = -1,
+            </if>
+            <if test="update_time != null" >
+                update_time = CURRENT_TIMESTAMP ,
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--6.获取派送单状态-->
+    <select id="getStatue" resultType="int">
+        select paisong_info.statue from paisong_info where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!--7.根据name返回所有派送单信息-->
+    <select id="getByname" parameterType="String"  resultType="com.xuan.base.entity.admin.Paisong">
+        select * from paisong_info
+        <if test="withname != null ">
+            where name like CONCAT('%',#{withname},'%') and paisong_info.statue>0
+        </if>
+    </select>
+
+    <!--8.根据id返回所有派送单-->
+    <select id="getByUserId" parameterType="int" resultType="com.xuan.base.entity.admin.Paisong" useCache="false" flushCache="true">
+        select distinct(paisong_info.id), paisong_info.id,paisong_info.name,paisong_info.dingdan_id,paisong_info.create_time,paisong_info.update_time,paisong_info.dingdan_no,paisong_info.wuliu_no,paisong_info.statue
+        from paisong_info,uniqlo_order,uniqlo_frontuser
+        where paisong_info.dingdan_id=uniqlo_order.id and uniqlo_order.frontuser_id=#{userid}
+    </select>
+
+    <!--9.查找所有待审核的派送单-->
+    <select id="getByCheck"  resultType="com.xuan.base.entity.admin.Paisong">
+        select paisong_info.id,paisong_info.name,paisong_info.dingdan_id,paisong_info.create_time,paisong_info.update_time,paisong_info.dingdan_no,paisong_info.wuliu_no,paisong_info.statue
+        from paisong_info
+        where paisong_info.statue=4
+    </select>
+
+    <!--10根据订单id查找派送单-->
+    <select id="getByOrderId" parameterType="int" resultType="com.xuan.base.entity.admin.Paisong">
+        select * from paisong_info where paisong_info.dingdan_id=orderid
+    </select>
+
+    <!--11.根据订单id把派送单状态直接更新到已完成-->
+    <select id="updateFinish" parameterType="int" >
+        update paisong_info
+        <set >
+            <if test="statue != null" >
+                statue = 5,
+            </if>
+            <if test="update_time != null" >
+                update_time = CURRENT_TIMESTAMP ,
+            </if>
+
+        </set>
+        where dingdan_id = #{orderid,jdbcType=INTEGER}
+    </select>
+
+</mapper>
